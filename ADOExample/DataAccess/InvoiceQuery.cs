@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using ADOExample.DataAccess.Models;
+using System.Configuration;
 
 namespace ADOExample.DataAccess
 {
     class InvoiceQuery
     {
+        readonly string _connectionString = ConfigurationManager.ConnectionStrings["Chinook"].ConnectionString;
+
         public List<Invoice> GetInvoiceByTrackFirstLetter(string firstCharacter)
         {
-            using (var connection = new SqlConnection("Server=(local);Database=Chinook;Trusted_Connection=True;"))
+            using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
                 var cmd = connection.CreateCommand();
