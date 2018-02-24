@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
+using ADOExample.DataAccess;
 
 namespace ADOExample
 {
@@ -9,25 +11,12 @@ namespace ADOExample
         {
             var firstLetter = Console.ReadLine();
 
-            using (var connection = new SqlConnection("Server=(local);Database=Chinook;Trusted_Connection=True;"))
+            var invoiceQuery = new InvoiceQuery();
+            var invoices = invoiceQuery.GetInvoiceByTrackFirstLetter(firstLetter);
+
+            foreach (var invoice in invoices)
             {
-                connection.Open();
-
-                var cmd = connection.CreateCommand();
-                cmd.CommandText = $@"select  x.invoiceid,BillingAddress
-                                from invoice i
-	                                join InvoiceLine x on x.InvoiceId = i.InvoiceId
-                                where exists (select TrackId from Track where Name like '{firstLetter}%' and TrackId = x.TrackId)";
-
-                var reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    var invoiceId = reader.GetInt32(0);
-                    var billingAddress = reader["BillingAddress"].ToString();
-
-                    Console.WriteLine($"Invoice {invoiceId} is going to {billingAddress}");
-                }
+                Console.WriteLine($"Invoice Id {invoice.InvoiceId} was shipped to {invoice.BillingAddress}.");
             }
 
             Console.ReadLine();
